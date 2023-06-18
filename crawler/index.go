@@ -19,6 +19,7 @@ type CrawlData struct {
 }
 
 type ParsedBody struct {
+	CrawlTime       time.Duration
 	PageTitle       string
 	PageDescription string
 	Headings        string
@@ -39,8 +40,6 @@ func RunCrawl(inputUrl string) CrawlData {
 	contentType := resp.Header.Get("Content-Type")
 	if strings.HasPrefix(contentType, "text/html") {
 		// response is HTML
-		statusCode := resp.StatusCode
-		fmt.Println(statusCode)
 		data, err := parseBody(resp.Body, baseUrl)
 		if err != nil {
 			fmt.Println("something went wrong getting data from html body")
@@ -76,6 +75,7 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 	fmt.Println("Crawl took", end.Sub(start), "to run")
 	// Return the data
 	return ParsedBody{
+		CrawlTime:       end.Sub(start),
 		PageTitle:       title,
 		PageDescription: desc,
 		Headings:        headings,
@@ -93,8 +93,8 @@ func getLinks(node *html.Node, baseUrl *url.URL) []string {
 			for _, attr := range node.Attr {
 				if attr.Key == "href" {
 					url, err := url.Parse(attr.Val)
-					// Check for errors or if url starts with hashtag or is mail link
-					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") {
+					// Check for errors or if url starts with hashtag, is mail link or telephone link
+					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") || strings.HasPrefix(url.String(), "tel") {
 						continue
 					}
 					// If url is absolute then append it. Else add the baseUrl
