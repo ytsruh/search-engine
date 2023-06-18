@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
+
 	"ytsruh.com/search/crawler"
 )
 
 func main() {
-	crawler.RunCrawl()
+	response := crawler.RunCrawl("https://www.ytsruh.com")
+	fmt.Println(response)
 }

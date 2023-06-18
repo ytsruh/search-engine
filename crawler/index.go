@@ -13,7 +13,8 @@ import (
 
 type CrawlData struct {
 	Url          string
-	ResponseCode string
+	Success      bool
+	ResponseCode int
 	CrawlData    ParsedBody
 }
 
@@ -24,15 +25,14 @@ type ParsedBody struct {
 	Links           []string
 }
 
-func RunCrawl() {
-	inputUrl := "https://www.ytsruh.com"
+func RunCrawl(inputUrl string) CrawlData {
 	resp, err := http.Get(inputUrl)
 	baseUrl, _ := url.Parse(inputUrl)
 	// Check for error or if respode code is not 200
 	if err != nil || resp.StatusCode != 200 {
 		fmt.Print(err)
 		fmt.Println("something went wrong fetch the body")
-		return
+		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
 	defer resp.Body.Close()
 	// Check the content type is text/html
@@ -44,11 +44,13 @@ func RunCrawl() {
 		data, err := parseBody(resp.Body, baseUrl)
 		if err != nil {
 			fmt.Println("something went wrong getting data from html body")
+			return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 		}
-		fmt.Println(data)
+		return CrawlData{Url: inputUrl, Success: true, ResponseCode: resp.StatusCode, CrawlData: data}
 	} else {
 		// response is not HTML
 		fmt.Println("non html response detected")
+		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
 
 }
