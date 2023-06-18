@@ -13,7 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/helmet/v2"
 	"github.com/joho/godotenv"
-	"ytsruh.com/search/db"
+	database "ytsruh.com/search/db"
 	"ytsruh.com/search/routes"
 )
 
@@ -39,8 +39,9 @@ func main() {
 	app.Use(recover.New())
 	database.Setup()
 
-	//Define API routes
+	//Define API routes & start cron tasks
 	routes.SetRoutes((app))
+	//RunCron()
 
 	//Start server with graceful shutdown
 	// Listen from goroutine

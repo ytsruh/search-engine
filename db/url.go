@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,7 +17,7 @@ type CrawledUrl struct {
 	PageTitle       string         `json:"pageTitle"`
 	PageDescription string         `json:"pageDescription"`
 	Headings        string         `json:"headings"`
-	LastTested      time.Time      `json:"lastTested"`
+	LastTested      *time.Time     `json:"lastTested"` // Use pointer so this value can be nil
 	CreatedAt       time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt       time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt       gorm.DeletedAt `gorm:"index"`
@@ -46,18 +47,30 @@ func GetUrl(id uint64) (CrawledUrl, error) {
 	return url, nil
 }
 
-func CreateUrl(input CrawledUrl) error {
-	tx := db.Create(&input)
-	return tx.Error
+func CreateUrl(input *CrawledUrl) error {
+	tx := db.Create(input)
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return tx.Error
+	}
+	return nil
 }
 
-func UpdateUrl(input CrawledUrl) error {
+func UpdateUrl(input CrawledUrl) (*gorm.DB, error) {
 	tx := db.Save(&input)
-	return tx.Error
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return nil, tx.Error
+	}
+	return tx, nil
 }
 
-func DeleteUrl(id uuid.UUID) error {
+func DeleteUrl(id uuid.UUID) (*gorm.DB, error) {
 	// Unscoped is for a full delete instead of a soft delete
 	tx := db.Unscoped().Delete(&CrawledUrl{}, id)
-	return tx.Error
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return nil, tx.Error
+	}
+	return tx, nil
 }
