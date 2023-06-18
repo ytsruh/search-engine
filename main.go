@@ -7,13 +7,14 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"ytsruh.com/search/routes"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/helmet/v2"
 	"github.com/joho/godotenv"
+	"ytsruh.com/search/db"
+	"ytsruh.com/search/routes"
 )
 
 func main() {
@@ -32,10 +33,11 @@ func main() {
 		IdleTimeout: 5 * time.Second,
 	})
 
-	// Setup middleware
+	// Setup middleware & DB connection
 	app.Use(compress.New())
 	app.Use(helmet.New())
 	app.Use(recover.New())
+	database.Setup()
 
 	//Define API routes
 	routes.SetRoutes((app))

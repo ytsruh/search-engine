@@ -20,7 +20,7 @@ func SetRoutes(app *fiber.App) {
 		input := new(Input)
 		if err := c.BodyParser(input); err != nil {
 			return c.JSON(fiber.Map{
-				"message": "failed to parse body request",
+				"message": "failed to parse request body",
 			})
 		}
 		url, err := url.ParseRequestURI(input.Url)
@@ -32,7 +32,8 @@ func SetRoutes(app *fiber.App) {
 		}
 		response := crawler.RunCrawl(url.String())
 		return c.JSON(fiber.Map{
-			"message": response,
+			"message": "crawl successful",
+			"data":    response,
 		})
 	})
 
