@@ -43,7 +43,6 @@ func main() {
 	//Define API routes & start cron tasks
 	routes.SetRoutes((app))
 	lib.RunCron()
-	lib.RunSearch()
 
 	//Start server with graceful shutdown
 	// Listen from goroutine

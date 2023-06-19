@@ -10,17 +10,13 @@ import (
 
 func RunCron() {
 	c := cron.New()
-	c.AddFunc("* * * * *", searchEngine)
+	c.AddFunc("0 * * * *", searchEngine) // Run every hour
 	c.Start()
 	cronCount := len(c.Entries())
 	fmt.Printf("Setup %d cron jobs \n", cronCount)
 }
 
 func searchEngine() {
-
-}
-
-func RunSearch() {
 	fmt.Println("started search engine crawl...")
 	defer fmt.Println("search engine crawl has finished")
 	// Get next 10 urls to be tested
@@ -38,7 +34,7 @@ func RunSearch() {
 			// Push a failed crawl to the array
 			fmt.Println("something went wrong running the crawl")
 			// Update row in database
-			updated, err := database.UpdateUrl(database.CrawledUrl{
+			_, err := database.UpdateUrl(database.CrawledUrl{
 				ID:              value.ID,
 				Url:             result.Url,
 				Success:         false,
@@ -52,11 +48,10 @@ func RunSearch() {
 			if err != nil {
 				fmt.Println("something went wrong updating a failed url")
 			}
-			fmt.Println(updated)
 			continue
 		}
 		// Push a successful crawl to the array
-		updated, err := database.UpdateUrl(database.CrawledUrl{
+		_, err := database.UpdateUrl(database.CrawledUrl{
 			ID:              value.ID,
 			Url:             result.Url,
 			Success:         true,
@@ -70,13 +65,15 @@ func RunSearch() {
 		if err != nil {
 			fmt.Printf("something went wrong updating %v /n", value.Url)
 		}
-		fmt.Println(updated)
-		// Push the newly found urls to an array
-		for _, newUrl := range result.CrawlData.Links {
+		// Push the newly found external urls to an array
+		for _, newUrl := range result.CrawlData.Links.External {
 			newUrls = append(newUrls, database.CrawledUrl{Url: newUrl})
 		}
 	} // End of range
-
-	fmt.Println(len(newUrls))
-
+	// Insert newly found urls into database
+	error := database.InsertManyUrls(&newUrls)
+	if error != nil {
+		fmt.Println("something went wrong adding new urls to database")
+	}
+	fmt.Printf("Added %d new urls to database \n", len(newUrls))
 }

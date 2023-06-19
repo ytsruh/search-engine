@@ -23,7 +23,12 @@ type ParsedBody struct {
 	PageTitle       string
 	PageDescription string
 	Headings        string
-	Links           []string
+	Links           Links
+}
+
+type Links struct {
+	Internal []string
+	External []string
 }
 
 func RunCrawl(inputUrl string) CrawlData {
@@ -83,8 +88,8 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 }
 
 // Depth First Search (DFS) of the html tree structure. This is a recursive function to scan the full tree.
-func getLinks(node *html.Node, baseUrl *url.URL) []string {
-	var links []string
+func getLinks(node *html.Node, baseUrl *url.URL) Links {
+	links := Links{}
 	var findLinks func(*html.Node)
 	findLinks = func(node *html.Node) {
 		// Check if the current node is an `html.ElementNode` and if it has a tag name of "a" (i.e., an anchor tag).
@@ -92,16 +97,20 @@ func getLinks(node *html.Node, baseUrl *url.URL) []string {
 			for _, attr := range node.Attr {
 				if attr.Key == "href" {
 					url, err := url.Parse(attr.Val)
-					// Check for errors or if url starts with hashtag, is mail link or telephone link
-					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") || strings.HasPrefix(url.String(), "tel") {
+					// Check for errors or if url starts with hashtag, is mail, telephone or javascript link
+					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") || strings.HasPrefix(url.String(), "tel") || strings.HasPrefix(url.String(), "javascript") {
 						continue
 					}
-					// If url is absolute then append it. Else add the baseUrl
+					// If url is absolute then test if internal or extend before append. Else add the baseUrl append as internal
 					if url.IsAbs() {
-						links = append(links, url.String())
+						if isSameHost(url.String(), baseUrl.String()) {
+							links.Internal = append(links.Internal, url.String())
+						} else {
+							links.External = append(links.External, url.String())
+						}
 					} else {
-						abs := baseUrl.ResolveReference(url)
-						links = append(links, abs.String())
+						rel := baseUrl.ResolveReference(url)
+						links.Internal = append(links.Internal, rel.String())
 					}
 				}
 			}
@@ -114,6 +123,20 @@ func getLinks(node *html.Node, baseUrl *url.URL) []string {
 	findLinks(node)
 
 	return links
+}
+
+func isSameHost(absoluteURL string, baseURL string) bool {
+	absURL, err := url.Parse(absoluteURL)
+	if err != nil {
+		return false
+	}
+
+	baseURLParsed, err := url.Parse(baseURL)
+	if err != nil {
+		return false
+	}
+
+	return absURL.Host == baseURLParsed.Host
 }
 
 func getPageData(node *html.Node) (string, string) {

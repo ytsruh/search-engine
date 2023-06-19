@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CrawledUrl struct {
@@ -45,6 +46,15 @@ func GetUrl(id uint64) (CrawledUrl, error) {
 
 func CreateUrl(input *CrawledUrl) error {
 	tx := db.Create(input)
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return tx.Error
+	}
+	return nil
+}
+
+func InsertManyUrls(input *[]CrawledUrl) error {
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).Create(input)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return tx.Error
