@@ -1,4 +1,4 @@
-package crawler
+package lib
 
 import (
 	"fmt"
@@ -13,42 +13,48 @@ import (
 
 type CrawlData struct {
 	Url          string
-	ResponseCode string
+	Success      bool
+	ResponseCode int
 	CrawlData    ParsedBody
 }
 
 type ParsedBody struct {
+	CrawlTime       time.Duration
 	PageTitle       string
 	PageDescription string
 	Headings        string
-	Links           []string
+	Links           Links
 }
 
-func RunCrawl() {
-	inputUrl := "https://www.ytsruh.com"
+type Links struct {
+	Internal []string
+	External []string
+}
+
+func RunCrawl(inputUrl string) CrawlData {
 	resp, err := http.Get(inputUrl)
 	baseUrl, _ := url.Parse(inputUrl)
 	// Check for error or if respode code is not 200
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Print(err)
+		fmt.Println(err)
 		fmt.Println("something went wrong fetch the body")
-		return
+		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
 	defer resp.Body.Close()
 	// Check the content type is text/html
 	contentType := resp.Header.Get("Content-Type")
 	if strings.HasPrefix(contentType, "text/html") {
 		// response is HTML
-		statusCode := resp.StatusCode
-		fmt.Println(statusCode)
 		data, err := parseBody(resp.Body, baseUrl)
 		if err != nil {
 			fmt.Println("something went wrong getting data from html body")
+			return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 		}
-		fmt.Println(data)
+		return CrawlData{Url: inputUrl, Success: true, ResponseCode: resp.StatusCode, CrawlData: data}
 	} else {
 		// response is not HTML
 		fmt.Println("non html response detected")
+		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
 
 }
@@ -71,9 +77,9 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 
 	// Record timings
 	end := time.Now()
-	fmt.Println("Crawl took", end.Sub(start), "to run")
 	// Return the data
 	return ParsedBody{
+		CrawlTime:       end.Sub(start),
 		PageTitle:       title,
 		PageDescription: desc,
 		Headings:        headings,
@@ -82,8 +88,8 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 }
 
 // Depth First Search (DFS) of the html tree structure. This is a recursive function to scan the full tree.
-func getLinks(node *html.Node, baseUrl *url.URL) []string {
-	var links []string
+func getLinks(node *html.Node, baseUrl *url.URL) Links {
+	links := Links{}
 	var findLinks func(*html.Node)
 	findLinks = func(node *html.Node) {
 		// Check if the current node is an `html.ElementNode` and if it has a tag name of "a" (i.e., an anchor tag).
@@ -91,16 +97,20 @@ func getLinks(node *html.Node, baseUrl *url.URL) []string {
 			for _, attr := range node.Attr {
 				if attr.Key == "href" {
 					url, err := url.Parse(attr.Val)
-					// Check for errors or if url starts with hashtag or is mail link
-					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") {
+					// Check for errors or if url starts with hashtag, is mail, telephone or javascript link
+					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") || strings.HasPrefix(url.String(), "tel") || strings.HasPrefix(url.String(), "javascript") {
 						continue
 					}
-					// If url is absolute then append it. Else add the baseUrl
+					// If url is absolute then test if internal or extend before append. Else add the baseUrl append as internal
 					if url.IsAbs() {
-						links = append(links, url.String())
+						if isSameHost(url.String(), baseUrl.String()) {
+							links.Internal = append(links.Internal, url.String())
+						} else {
+							links.External = append(links.External, url.String())
+						}
 					} else {
-						abs := baseUrl.ResolveReference(url)
-						links = append(links, abs.String())
+						rel := baseUrl.ResolveReference(url)
+						links.Internal = append(links.Internal, rel.String())
 					}
 				}
 			}
@@ -113,6 +123,20 @@ func getLinks(node *html.Node, baseUrl *url.URL) []string {
 	findLinks(node)
 
 	return links
+}
+
+func isSameHost(absoluteURL string, baseURL string) bool {
+	absURL, err := url.Parse(absoluteURL)
+	if err != nil {
+		return false
+	}
+
+	baseURLParsed, err := url.Parse(baseURL)
+	if err != nil {
+		return false
+	}
+
+	return absURL.Host == baseURLParsed.Host
 }
 
 func getPageData(node *html.Node) (string, string) {
