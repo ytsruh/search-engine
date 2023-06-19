@@ -5,8 +5,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
-	"ytsruh.com/search/crawler"
 	database "ytsruh.com/search/db"
+	"ytsruh.com/search/lib"
 )
 
 type Input struct {
@@ -32,7 +32,7 @@ func SetRoutes(app *fiber.App) {
 				"url":     input.Url,
 			})
 		}
-		response := crawler.RunCrawl(url.String())
+		response := lib.RunCrawl(url.String())
 		return c.JSON(fiber.Map{
 			"message": "crawl successful",
 			"data":    response,

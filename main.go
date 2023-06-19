@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/helmet/v2"
 	"github.com/joho/godotenv"
 	database "ytsruh.com/search/db"
+	"ytsruh.com/search/lib"
 	"ytsruh.com/search/routes"
 )
 
@@ -41,7 +42,8 @@ func main() {
 
 	//Define API routes & start cron tasks
 	routes.SetRoutes((app))
-	//RunCron()
+	lib.RunCron()
+	lib.RunSearch()
 
 	//Start server with graceful shutdown
 	// Listen from goroutine

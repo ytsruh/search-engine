@@ -1,4 +1,4 @@
-package crawler
+package lib
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ func RunCrawl(inputUrl string) CrawlData {
 	baseUrl, _ := url.Parse(inputUrl)
 	// Check for error or if respode code is not 200
 	if err != nil || resp.StatusCode != 200 {
-		fmt.Print(err)
+		fmt.Println(err)
 		fmt.Println("something went wrong fetch the body")
 		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
@@ -72,7 +72,6 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 
 	// Record timings
 	end := time.Now()
-	fmt.Println("Crawl took", end.Sub(start), "to run")
 	// Return the data
 	return ParsedBody{
 		CrawlTime:       end.Sub(start),

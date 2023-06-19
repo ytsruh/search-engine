@@ -11,7 +11,7 @@ import (
 type CrawledUrl struct {
 	ID              uuid.UUID      `json:"id" gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	Url             string         `json:"url" gorm:"unique;not null"`
-	Success         bool           `json:"success"`
+	Success         bool           `json:"success" gorm:"default:null"`
 	CrawlDuration   time.Duration  `json:"crawlDuration"`
 	ResponseCode    int            `json:"responseCode"`
 	PageTitle       string         `json:"pageTitle"`
@@ -25,25 +25,21 @@ type CrawledUrl struct {
 
 func GetAllUrls() ([]CrawledUrl, error) {
 	var urls []CrawledUrl
-
 	tx := db.Find(&urls)
-
 	if tx.Error != nil {
+		fmt.Print(tx.Error)
 		return []CrawledUrl{}, tx.Error
 	}
-
 	return urls, nil
 }
 
 func GetUrl(id uint64) (CrawledUrl, error) {
 	var url CrawledUrl
-
 	tx := db.Where("id = ?", id).First(&url)
-
 	if tx.Error != nil {
+		fmt.Print(tx.Error)
 		return CrawledUrl{}, tx.Error
 	}
-
 	return url, nil
 }
 
@@ -73,4 +69,14 @@ func DeleteUrl(id uuid.UUID) (*gorm.DB, error) {
 		return nil, tx.Error
 	}
 	return tx, nil
+}
+
+func GetNextCrawlUrls() ([]CrawledUrl, error) {
+	var urls []CrawledUrl
+	tx := db.Where("last_tested IS NULL").Limit(10).Find(&urls)
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return []CrawledUrl{}, tx.Error
+	}
+	return urls, nil
 }
