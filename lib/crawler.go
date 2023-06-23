@@ -38,6 +38,7 @@ func RunCrawl(inputUrl string) CrawlData {
 	if err != nil || resp.StatusCode != 200 {
 		fmt.Println(err)
 		fmt.Println("something went wrong fetch the body")
+		resp.Body.Close()
 		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
 	defer resp.Body.Close()
@@ -97,8 +98,8 @@ func getLinks(node *html.Node, baseUrl *url.URL) Links {
 			for _, attr := range node.Attr {
 				if attr.Key == "href" {
 					url, err := url.Parse(attr.Val)
-					// Check for errors or if url starts with hashtag, is mail, telephone or javascript link
-					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") || strings.HasPrefix(url.String(), "tel") || strings.HasPrefix(url.String(), "javascript") {
+					// Check for errors or if url is 1)a hashtag/anchor 2) is mail link, 3) is a telephone link, 4)is a javascript link 5) is a PDF or MD file
+					if err != nil || strings.HasPrefix(url.String(), "#") || strings.HasPrefix(url.String(), "mail") || strings.HasPrefix(url.String(), "tel") || strings.HasPrefix(url.String(), "javascript") || strings.HasSuffix(url.String(), ".pdf") || strings.HasSuffix(url.String(), ".md") {
 						continue
 					}
 					// If url is absolute then test if internal or extend before append. Else add the baseUrl append as internal

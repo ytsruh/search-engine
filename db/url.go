@@ -54,7 +54,8 @@ func CreateUrl(input *CrawledUrl) error {
 }
 
 func InsertManyUrls(input *[]CrawledUrl) error {
-	tx := db.Clauses(clause.OnConflict{DoNothing: true}).Create(input)
+	// Dont update 'created_at' column & ignore if the entry has conflict (is not unique)
+	tx := db.Omit("created_at").Clauses(clause.OnConflict{DoNothing: true}).Create(input)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return tx.Error
