@@ -17,7 +17,25 @@ func SetRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	api.Get("/metrics", monitor.New(monitor.Config{Title: "Live Server Metrics"}))
-
+	api.Post("/settings", func(c *fiber.Ctx) error {
+		settings := &database.Settings{
+			ID: 1,
+		}
+		if err := c.BodyParser(settings); err != nil {
+			return c.JSON(fiber.Map{
+				"message": "failed to parse request body",
+			})
+		}
+		_, err := database.UpdateSettings(*settings)
+		if err != nil {
+			return c.JSON(fiber.Map{
+				"message": "failed to update settings",
+			})
+		}
+		return c.JSON(fiber.Map{
+			"message": "settings were updated",
+		})
+	})
 	api.Post("/crawl", func(c *fiber.Ctx) error {
 		input := new(Input)
 		if err := c.BodyParser(input); err != nil {
