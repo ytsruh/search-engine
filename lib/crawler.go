@@ -67,7 +67,6 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 		fmt.Println("something went wrong parsing body")
 		return ParsedBody{}, err
 	}
-
 	start := time.Now()
 	// Get the links from the doc
 	links := getLinks(doc, baseUrl)
@@ -91,6 +90,9 @@ func parseBody(body io.Reader, baseUrl *url.URL) (ParsedBody, error) {
 // Depth First Search (DFS) of the html tree structure. This is a recursive function to scan the full tree.
 func getLinks(node *html.Node, baseUrl *url.URL) Links {
 	links := Links{}
+	if node == nil {
+		return links
+	}
 	var findLinks func(*html.Node)
 	findLinks = func(node *html.Node) {
 		// Check if the current node is an `html.ElementNode` and if it has a tag name of "a" (i.e., an anchor tag).
@@ -141,13 +143,22 @@ func isSameHost(absoluteURL string, baseURL string) bool {
 }
 
 func getPageData(node *html.Node) (string, string) {
+	if node == nil {
+		return "", ""
+	}
 	// Find the page title and description
 	title, desc := "", ""
 	var findMetaAndTitle func(*html.Node)
 	findMetaAndTitle = func(node *html.Node) {
 		// Recursive function to search for `meta` elements in the HTML tree and extracts their `name` and `content` attributes.
 		if node.Type == html.ElementNode && node.Data == "title" {
-			title = node.FirstChild.Data
+			// Check if first child is empty
+			if node.FirstChild == nil {
+				title = ""
+			} else {
+				title = node.FirstChild.Data
+			}
+
 		} else if node.Type == html.ElementNode && node.Data == "meta" {
 			var name, content string
 			for _, attr := range node.Attr {
@@ -170,6 +181,9 @@ func getPageData(node *html.Node) (string, string) {
 }
 
 func getPageHeadings(n *html.Node) string {
+	if n == nil {
+		return ""
+	}
 	// Find all h1 elements and concatenate their content
 	var headings strings.Builder
 	var findH1 func(*html.Node)

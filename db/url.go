@@ -83,9 +83,9 @@ func DeleteUrl(id uuid.UUID) (*gorm.DB, error) {
 	return tx, nil
 }
 
-func GetNextCrawlUrls() ([]CrawledUrl, error) {
+func GetNextCrawlUrls(limit int) ([]CrawledUrl, error) {
 	var urls []CrawledUrl
-	tx := db.Where("last_tested IS NULL").Limit(10).Find(&urls)
+	tx := db.Where("last_tested IS NULL").Limit(limit).Find(&urls)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return []CrawledUrl{}, tx.Error
