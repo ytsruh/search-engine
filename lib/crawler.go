@@ -189,8 +189,11 @@ func getPageHeadings(n *html.Node) string {
 	var findH1 func(*html.Node)
 	findH1 = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "h1" {
-			headings.WriteString(n.FirstChild.Data)
-			headings.WriteString(", ")
+			// Check if first child is empty
+			if n.FirstChild != nil {
+				headings.WriteString(n.FirstChild.Data)
+				headings.WriteString(", ")
+			}
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			findH1(c)

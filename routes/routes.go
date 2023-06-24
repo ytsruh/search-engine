@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/gofiber/fiber/v2"
@@ -13,10 +14,49 @@ type Input struct {
 	Url string
 }
 
+type SearchTerm struct {
+	SearchTerm string
+}
+
 func SetRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	api.Get("/metrics", monitor.New(monitor.Config{Title: "Live Server Metrics"}))
+	api.Post("/search", func(c *fiber.Ctx) error {
+		searchTerm := &SearchTerm{}
+		if err := c.BodyParser(searchTerm); err != nil {
+			fmt.Println(err)
+			return c.JSON(fiber.Map{
+				"message": "failed to parse request body",
+			})
+		}
+		// Check if search term is empty
+		if len(searchTerm.SearchTerm) == 0 {
+			return c.JSON(fiber.Map{
+				"message": "search term is empty",
+			})
+		}
+		// Search database for search term
+		results, err := database.TextSearch(searchTerm.SearchTerm)
+		if err != nil {
+			return c.JSON(fiber.Map{
+				"message": "failed to get results",
+			})
+		}
+		// Put results into new struct
+		searchResults := []database.SearchResult{}
+		for _, v := range results {
+			searchResults = append(searchResults, database.SearchResult{
+				Url:             v.Url,
+				PageTitle:       v.PageTitle,
+				PageDescription: v.PageDescription,
+			})
+		}
+		return c.JSON(fiber.Map{
+			"count":   len(searchResults),
+			"message": searchResults,
+		})
+	})
 	api.Post("/settings", func(c *fiber.Ctx) error {
 		settings := &database.Settings{
 			ID: 1,
