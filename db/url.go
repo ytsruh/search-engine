@@ -54,8 +54,8 @@ func CreateUrl(input *CrawledUrl) error {
 }
 
 func InsertManyUrls(input *[]CrawledUrl) error {
-	// Dont update 'created_at' column & ignore if the entry has conflict (is not unique)
-	tx := db.Omit("created_at").Clauses(clause.OnConflict{DoNothing: true}).Create(input)
+	// Ignore if the entry has conflict (is not unique)
+	tx := db.Clauses(clause.OnConflict{DoNothing: true}).Create(input)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return tx.Error
@@ -64,7 +64,8 @@ func InsertManyUrls(input *[]CrawledUrl) error {
 }
 
 func UpdateUrl(input CrawledUrl) (*gorm.DB, error) {
-	tx := db.Save(&input)
+	// Dont update 'created_at' column
+	tx := db.Omit("created_at").Save(&input)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return nil, tx.Error
