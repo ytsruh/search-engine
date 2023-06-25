@@ -24,6 +24,12 @@ type CrawledUrl struct {
 	DeletedAt       gorm.DeletedAt `gorm:"index"`
 }
 
+type SearchResult struct {
+	Url             string `json:"url" gorm:"unique;not null"`
+	PageTitle       string `json:"pageTitle"`
+	PageDescription string `json:"pageDescription"`
+}
+
 func GetAllUrls() ([]CrawledUrl, error) {
 	var urls []CrawledUrl
 	tx := db.Find(&urls)
@@ -86,6 +92,17 @@ func DeleteUrl(id uuid.UUID) (*gorm.DB, error) {
 func GetNextCrawlUrls(limit int) ([]CrawledUrl, error) {
 	var urls []CrawledUrl
 	tx := db.Where("last_tested IS NULL").Limit(limit).Find(&urls)
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return []CrawledUrl{}, tx.Error
+	}
+	return urls, nil
+}
+
+func TextSearch(input string) ([]CrawledUrl, error) {
+	searchText := "%" + input + "%"
+	var urls []CrawledUrl
+	tx := db.Where("success = ? AND url LIKE ?", true, searchText).Or("page_title LIKE ?", searchText).Or("page_description LIKE ?", searchText).Or("headings LIKE ?", searchText).Find(&urls)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return []CrawledUrl{}, tx.Error
