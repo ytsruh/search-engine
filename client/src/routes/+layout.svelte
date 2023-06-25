@@ -15,7 +15,7 @@
 	<svelte:fragment slot="header">
 		<!-- App Bar -->
 		<AppBar>
-			<svelte:fragment slot="lead"><div class="icon"><FaSearchengin /></div></svelte:fragment>
+			<svelte:fragment slot="lead"><a href="/" class="icon"><FaSearchengin /></a></svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a class="btn btn-sm variant-ghost-tertiary" href="/"> Home </a>
 				<a class="btn btn-sm variant-ghost-tertiary" href="/stats"> Stats </a>
