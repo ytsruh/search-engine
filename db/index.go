@@ -23,7 +23,7 @@ func Setup() {
 		panic(err)
 	}
 
-	err = db.AutoMigrate(&CrawledUrl{}, &Settings{})
+	err = db.AutoMigrate(&CrawledUrl{}, &Settings{}, &SearchQuery{})
 	if err != nil {
 		log.Println(err)
 	}

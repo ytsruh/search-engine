@@ -22,6 +22,34 @@ func SetRoutes(app *fiber.App) {
 	api := app.Group("/api")
 
 	api.Get("/metrics", monitor.New(monitor.Config{Title: "Live Server Metrics"}))
+	api.Use("/search", func(c *fiber.Ctx) error {
+		// Check if query is from localhost & ignore if true
+		if c.IP() == "127.0.0.1" {
+			// Go to next middleware:
+			return c.Next()
+		}
+		// Get search term from body
+		searchTerm := &SearchTerm{}
+		if err := c.BodyParser(searchTerm); err != nil {
+			fmt.Println(err)
+			return c.JSON(fiber.Map{
+				"message": "failed to parse request body",
+			})
+		}
+		// Create query & save to database
+		err := database.CreateQuery(&database.SearchQuery{
+			Query:     searchTerm.SearchTerm,
+			IP:        c.IP(),
+			UserAgent: c.Get("User-Agent"),
+			Platform:  c.Get("Sec-Ch-Ua-Platform"),
+		})
+		// Check if query was saved but no action needed
+		if err != nil {
+			println("failed to save query to database")
+		}
+		// Go to next middleware:
+		return c.Next()
+	})
 	api.Post("/search", func(c *fiber.Ctx) error {
 		searchTerm := &SearchTerm{}
 		if err := c.BodyParser(searchTerm); err != nil {
