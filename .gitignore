@@ -1,2 +1,10 @@
 .env
 /tmp
+
+# Client
+.DS_Store
+node_modules
+/client/build
+/client/.svelte-kit
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
