@@ -10,8 +10,8 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/helmet/v2"
 	"github.com/joho/godotenv"
 	database "ytsruh.com/search/db"
 	"ytsruh.com/search/lib"
@@ -40,9 +40,13 @@ func main() {
 	app.Use(recover.New())
 	database.Setup()
 
-	//Define API routes & start cron tasks
+	// Define API routes & start cron tasks
 	routes.SetRoutes((app))
 	lib.RunCron()
+
+	// Serve front end by using the fallback route
+	app.Static("/", "./static")
+	app.Static("*", "./static/404.html")
 
 	//Start server with graceful shutdown
 	// Listen from goroutine
