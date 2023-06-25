@@ -85,6 +85,15 @@ func SetRoutes(app *fiber.App) {
 			"results": searchResults,
 		})
 	})
+	api.Get("/stats", func(c *fiber.Ctx) error {
+		results, err := database.GetPublicStats()
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"message": "failed to get statistics",
+			})
+		}
+		return c.Status(200).JSON(results)
+	})
 	api.Post("/settings", func(c *fiber.Ctx) error {
 		settings := &database.Settings{
 			ID: 1,
