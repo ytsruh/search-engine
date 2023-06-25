@@ -54,20 +54,20 @@ func SetRoutes(app *fiber.App) {
 		searchTerm := &SearchTerm{}
 		if err := c.BodyParser(searchTerm); err != nil {
 			fmt.Println(err)
-			return c.JSON(fiber.Map{
+			return c.Status(500).JSON(fiber.Map{
 				"message": "failed to parse request body",
 			})
 		}
 		// Check if search term is empty
 		if len(searchTerm.SearchTerm) == 0 {
-			return c.JSON(fiber.Map{
+			return c.Status(500).JSON(fiber.Map{
 				"message": "search term is empty",
 			})
 		}
 		// Search database for search term
 		results, err := database.TextSearch(searchTerm.SearchTerm)
 		if err != nil {
-			return c.JSON(fiber.Map{
+			return c.Status(500).JSON(fiber.Map{
 				"message": "failed to get results",
 			})
 		}
@@ -80,9 +80,9 @@ func SetRoutes(app *fiber.App) {
 				PageDescription: v.PageDescription,
 			})
 		}
-		return c.JSON(fiber.Map{
+		return c.Status(200).JSON(fiber.Map{
 			"count":   len(searchResults),
-			"message": searchResults,
+			"results": searchResults,
 		})
 	})
 	api.Post("/settings", func(c *fiber.Ctx) error {
