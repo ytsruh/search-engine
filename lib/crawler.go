@@ -38,7 +38,10 @@ func RunCrawl(inputUrl string) CrawlData {
 	if err != nil || resp.StatusCode != 200 {
 		fmt.Println(err)
 		fmt.Println("something went wrong fetch the body")
-		resp.Body.Close()
+		// Check if body is not nil before trying to close it
+		if resp.Body != nil {
+			resp.Body.Close()
+		}
 		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
 	}
 	defer resp.Body.Close()
