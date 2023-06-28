@@ -109,3 +109,45 @@ func TextSearch(input string) ([]CrawledUrl, error) {
 	}
 	return urls, nil
 }
+
+type Result struct {
+	Date  time.Time `json:"date"`
+	Count int       `json:"count"`
+}
+type Counts struct {
+	CountAll   int64 `json:"countAll"`
+	CountTrue  int64 `json:"countTrue"`
+	CountFalse int64 `json:"countFalse"`
+}
+type Stats struct {
+	Count  Counts   `json:"counts"`
+	Latest []Result `json:"latest"`
+}
+
+func GetPublicStats() (Stats, error) {
+	var CountAll int64
+	var CountTrue int64
+	var CountFalse int64
+	var results []Result
+
+	db.Model(&CrawledUrl{}).Count(&CountAll)
+	db.Model(&CrawledUrl{}).Where("success = ?", true).Count(&CountTrue)
+	db.Model(&CrawledUrl{}).Where("success = ?", false).Count(&CountFalse)
+
+	startDate := time.Now().UTC().AddDate(0, 0, -7).Truncate(24 * time.Hour)
+	endDate := time.Now().UTC().Truncate(24 * time.Hour) // Truncate to midnight so results will not include today
+	db.Model(&CrawledUrl{}).
+		Select("DATE_TRUNC('day', created_at AT TIME ZONE 'UTC') AS date, COUNT(*) AS count").
+		Where("created_at BETWEEN ? AND ?", startDate, endDate).
+		Group("DATE_TRUNC('day', created_at AT TIME ZONE 'UTC')").
+		Order("date ASC").
+		Scan(&results)
+	return Stats{
+		Count: Counts{
+			CountAll:   CountAll,
+			CountTrue:  CountTrue,
+			CountFalse: CountFalse,
+		},
+		Latest: results,
+	}, nil
+}

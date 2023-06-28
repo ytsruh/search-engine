@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build && cp -r ./build ../static",
+		"build": "vite build && cd ../ && rm -rf ./static && cd ./client && cp -r ./build ../static",
 		"preview": "vite preview",
 		"test": "playwright test",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -39,6 +39,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"chart.js": "^4.3.0",
+		"svelte-chartjs": "^3.1.2",
 		"svelte-icons": "^2.1.0"
 	}
 }
