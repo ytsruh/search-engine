@@ -39,6 +39,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"chart.js": "^4.3.0",
+		"svelte-chartjs": "^3.1.2",
 		"svelte-icons": "^2.1.0"
 	}
 }
