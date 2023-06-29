@@ -117,7 +117,7 @@
 			</div>
 		</div>
 		<div class="card flex items-center justify-center">
-			<div class="px-10 py-20 w-full h-full">
+			<div class="px-10 py-20 w-full h-96">
 				<Line
 					data={chartData}
 					options={{
