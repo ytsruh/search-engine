@@ -8,6 +8,8 @@
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import FaSearchengin from 'svelte-icons/fa/FaSearchengin.svelte';
+	import { navigating } from '$app/stores';
+	import Loading from '$lib/Loading.svelte';
 </script>
 
 <!-- App Shell -->
@@ -18,13 +20,19 @@
 			<svelte:fragment slot="lead"><a href="/" class="icon"><FaSearchengin /></a></svelte:fragment>
 			<svelte:fragment slot="trail">
 				<a class="btn btn-sm variant-ghost-tertiary" href="/"> Home </a>
-				<a class="btn btn-sm variant-ghost-tertiary" href="/stats"> Stats </a>
+				<a class="btn btn-sm variant-ghost-tertiary" href="/stats" data-sveltekit-preload-data>
+					Stats
+				</a>
 				<LightSwitch />
 			</svelte:fragment>
 		</AppBar>
 	</svelte:fragment>
-	<!-- Page Route Content -->
-	<slot />
+	<!-- Page Route Content with loading state between long loads -->
+	{#if $navigating}
+		<Loading />
+	{:else}
+		<slot />
+	{/if}
 </AppShell>
 
 <style>
