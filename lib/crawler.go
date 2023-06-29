@@ -34,17 +34,19 @@ type Links struct {
 func RunCrawl(inputUrl string) CrawlData {
 	resp, err := http.Get(inputUrl)
 	baseUrl, _ := url.Parse(inputUrl)
-	// Check for error, if response is empty or if response code is not 200
-	if err != nil || resp == nil || resp.StatusCode != 200 {
+	// Check for error or if response is empty
+	if err != nil || resp == nil {
 		fmt.Println(err)
 		fmt.Println("something went wrong fetch the body")
-		// Check if resp & body is not nil before trying to close it
-		if resp != nil && resp.Body != nil {
-			resp.Body.Close()
-		}
-		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
+		return CrawlData{Url: inputUrl, Success: false, ResponseCode: 0, CrawlData: ParsedBody{}}
 	}
 	defer resp.Body.Close()
+	// Check if response code is not 200
+	if resp.StatusCode != 200 {
+		fmt.Println(err)
+		fmt.Println("status code is not 200")
+		return CrawlData{Url: inputUrl, Success: false, ResponseCode: resp.StatusCode, CrawlData: ParsedBody{}}
+	}
 	// Check the content type is text/html
 	contentType := resp.Header.Get("Content-Type")
 	if strings.HasPrefix(contentType, "text/html") {
