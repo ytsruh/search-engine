@@ -21,6 +21,7 @@ type SearchTerm struct {
 }
 
 func SetRoutes(app *fiber.App) {
+	SetupAuthRoutes(app)
 	api := app.Group("/api")
 
 	api.Get("/metrics", monitor.New(monitor.Config{Title: "Live Server Metrics"}))
