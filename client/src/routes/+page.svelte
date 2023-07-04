@@ -29,7 +29,7 @@
 		content="The homemade search engine built using Go (Golang), Fiber, Postgres & SvelteKit."
 	/>
 </svelte:head>
-<div class="flex flex-col h-full items-center justify-center">
+<div class="flex flex-col h-full items-center justify-center px-10">
 	<div
 		class="flex flex-col justify-center items-center space-y-5 pb-10 text-center px-10 break-words"
 	>
