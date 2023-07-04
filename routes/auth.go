@@ -98,6 +98,19 @@ func loginUser(c *fiber.Ctx) error {
 	})
 }
 
+func logoutUser(c *fiber.Ctx) error {
+	// Create & set new cookie with expired date
+	cookie := fiber.Cookie{
+		Name:    "search-engine",
+		Value:   "",
+		Expires: time.Now().Add(-time.Hour),
+	}
+	c.Cookie(&cookie)
+	return c.JSON(fiber.Map{
+		"message": "success",
+	})
+}
+
 func getUser(c *fiber.Ctx) error {
 	details := c.Locals("user").(*CustomClaims) // Get local context & type assertion to custom claims struct
 	user, err := database.GetUserByEmail(details.User)

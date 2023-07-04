@@ -20,6 +20,7 @@ func SetRoutes(app *fiber.App) {
 	auth := api.Group("/auth") // Routes located at : /api/auth
 	auth.Post("/register", registerUser)
 	auth.Post("/login", loginUser)
+	auth.Post("/logout", logoutUser)
 
 	admin := api.Group("/admin") // Routes located at : /api/admin
 	admin.Use(func(c *fiber.Ctx) error {
