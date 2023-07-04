@@ -9,6 +9,12 @@ import (
 	database "ytsruh.com/search/db"
 )
 
+type CustomClaims struct {
+	User                 string `json:"user"`
+	Id                   string `json:"id"`
+	jwt.RegisteredClaims `json:"claims"`
+}
+
 func registerUser(c *fiber.Ctx) error {
 	var data map[string]string
 	if err := c.BodyParser(&data); err != nil {
@@ -58,11 +64,13 @@ func loginUser(c *fiber.Ctx) error {
 		})
 	}
 
-	// Create the Claims
-	claims := jwt.MapClaims{
-		"email": user.Email,
-		"id":    user.Id,
-		"exp":   time.Now().Add(time.Hour * 12).Unix(),
+	claims := CustomClaims{
+		user.Email,
+		user.Id.String(),
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			Issuer:    "search-engine",
+		},
 	}
 
 	// Create token
@@ -76,24 +84,32 @@ func loginUser(c *fiber.Ctx) error {
 			"message": "could not login",
 		})
 	}
+	// Create and set the cookie
+	cookie := fiber.Cookie{
+		Name:     "search-engine",
+		Value:    signedToken,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true, // Meant only for the server
+	}
+	c.Cookie(&cookie)
 
-	c.Status(fiber.StatusOK)
-	return c.JSON(fiber.Map{
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "logged in",
-		"token":   signedToken,
 	})
 }
 
 func getUser(c *fiber.Ctx) error {
-	// c.Locals is set by the Protected() middleware & claims can be accessed from there
-	user := c.Locals("user").(*jwt.Token) // Type assert to type of *jwt.Token
-	claims := user.Claims.(jwt.MapClaims) // Type assert to type of claims
-	email := claims["email"].(string)     // Type assert to string
-	id := claims["id"].(string)
-	c.Status(fiber.StatusOK)
-	return c.JSON(fiber.Map{
-		"message": "authenticated",
-		"name":    email,
-		"id":      id,
+	details := c.Locals("user").(*CustomClaims) // Get local context & type assertion to custom claims struct
+	user, err := database.GetUserByEmail(details.User)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "failed to look up user",
+		})
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "success",
+		"email":   user.Email,
+		"id":      user.Id,
+		"name":    user.Name,
 	})
 }
