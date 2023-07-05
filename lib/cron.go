@@ -31,7 +31,7 @@ func searchEngine() {
 		return
 	}
 	// Check if search is turned on by checking settings
-	if settings.SearchOn == false {
+	if !settings.SearchOn {
 		fmt.Println("search is turned off")
 		return
 	} else {
@@ -47,7 +47,7 @@ func searchEngine() {
 		for _, value := range initialUrls {
 			result := RunCrawl(value.Url)
 			// Check if the crawl was not successul
-			if result.Success == false {
+			if !result.Success {
 				// Push a failed crawl to the array
 				fmt.Println("something went wrong running the crawl")
 				// Update row in database

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	database "ytsruh.com/search/db"
+	"ytsruh.com/search/lib"
 )
 
 func manuallyCreateUrl(c *fiber.Ctx) error {
@@ -53,5 +54,17 @@ func updateSettings(c *fiber.Ctx) error {
 	}
 	return c.JSON(fiber.Map{
 		"message": "settings were updated",
+	})
+}
+
+func getBackupList(c *fiber.Ctx) error {
+	results, err := lib.ListObjects()
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"message": "error getting objects",
+		})
+	}
+	return c.Status(200).JSON(fiber.Map{
+		"data": results,
 	})
 }
