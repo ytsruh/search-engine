@@ -50,6 +50,7 @@ func SetRoutes(app *fiber.App) {
 	})
 	admin.Get("/me", getUser)
 	admin.Post("/create", manuallyCreateUrl)
+	admin.Get("/backups", getBackupList)
 	admin.Put("/settings", updateSettings)
 
 }

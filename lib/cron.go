@@ -2,21 +2,26 @@ package lib
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 	"time"
 
 	"github.com/robfig/cron/v3"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	database "ytsruh.com/search/db"
 )
 
 func RunCron() {
 	c := cron.New()
-	c.AddFunc("0 * * * *", SearchEngine) // Run every hour
+	c.AddFunc("0 * * * *", searchEngine) // Run every hour
+	c.AddFunc("0 0 * * *", backupDB)     // Run at midnight every night
 	c.Start()
 	cronCount := len(c.Entries())
 	fmt.Printf("Setup %d cron jobs \n", cronCount)
 }
 
-func SearchEngine() {
+func searchEngine() {
 	fmt.Println("started search engine crawl...")
 	defer fmt.Println("search engine crawl has finished")
 	// Get crawl settings
@@ -26,7 +31,7 @@ func SearchEngine() {
 		return
 	}
 	// Check if search is turned on by checking settings
-	if settings.SearchOn == false {
+	if !settings.SearchOn {
 		fmt.Println("search is turned off")
 		return
 	} else {
@@ -42,7 +47,7 @@ func SearchEngine() {
 		for _, value := range initialUrls {
 			result := RunCrawl(value.Url)
 			// Check if the crawl was not successul
-			if result.Success == false {
+			if !result.Success {
 				// Push a failed crawl to the array
 				fmt.Println("something went wrong running the crawl")
 				// Update row in database
@@ -90,4 +95,39 @@ func SearchEngine() {
 		fmt.Printf("Added %d new urls to database \n", len(newUrls))
 	}
 
+}
+
+func backupDB() {
+	fmt.Println("started backup...")
+	defer fmt.Println("backup has finished")
+	// Define the connection string
+	connectionString := os.Getenv("DB_URL")
+	// Generate a filename with the current date and time
+	backupFileName := "search/" + time.Now().Format("20060102") + ".sql"
+	// Connect to the PostgreSQL database
+	db, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
+	if err != nil {
+		fmt.Println("Failed to connect to database:", err)
+		return
+	}
+	dbConn, err := db.DB()
+	if err != nil {
+		fmt.Println("Failed to get database connection:", err)
+		return
+	}
+	defer dbConn.Close()
+
+	// Execute the pg_dump command to backup the database
+	cmd := exec.Command("pg_dump", connectionString)
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Failed to backup database:", err)
+		return
+	}
+	uploadErr := UploadFile(output, backupFileName)
+	if uploadErr != nil {
+		fmt.Println("Failed to upload database backup:", uploadErr)
+		return
+	}
+	fmt.Println("Backup completed successfully! File:", backupFileName)
 }
