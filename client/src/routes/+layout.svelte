@@ -29,12 +29,20 @@
 					Stats
 				</a>
 				{#if $isLoggedIn}
-					<a class="btn btn-sm variant-ghost-tertiary" href="/admin/logout">
+					<a
+						class="btn btn-sm variant-ghost-tertiary"
+						href="/admin/logout"
+						data-sveltekit-preload-data="tap"
+					>
 						<span class="login-icon text-tertiary-900 dark:text-tertiary-100"><FaSignOutAlt /></span
 						>
 					</a>
 				{:else}
-					<a class="btn btn-sm variant-ghost-tertiary" href="/login">
+					<a
+						class="btn btn-sm variant-ghost-tertiary"
+						href="/login"
+						data-sveltekit-preload-data="tap"
+					>
 						<span class="login-icon text-tertiary-900 dark:text-tertiary-100"><FaSignInAlt /></span>
 					</a>
 				{/if}
