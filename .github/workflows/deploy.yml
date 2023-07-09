@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build:
@@ -40,7 +37,7 @@ jobs:
         run: rm -rf ./static && cd client && npm install --legacy-peer-deps && vite build && cp -r ./build ../static
 
       - name: Run Tests
-        run: go test
+        run: go test ./...
 
       - name: Deploy
         run: railway up
