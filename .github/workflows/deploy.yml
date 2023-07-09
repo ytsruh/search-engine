@@ -1,0 +1,48 @@
+name: Main CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build & Deploy
+
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install Railway
+        run: npm i -g @railway/cli
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Install node dependencies
+        run: cd client && npm install -g --legacy-peer-deps
+
+      - name: Install Vite
+        run: cd client && pwd && npm install -g vite
+
+      - name: Build client
+        run: rm -rf ./static && cd client && npm install --legacy-peer-deps && vite build && cp -r ./build ../static
+
+      - name: Run Tests
+        run: go test
+
+      - name: Deploy
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
