@@ -2,13 +2,31 @@ package routes
 
 import (
 	"os"
+	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/golang-jwt/jwt/v5"
 )
 
 var SecretKey = os.Getenv("SECRET_KEY")
+
+var cachedPaths = [2]string{"/api/stats", "/api/admin/backups"}
+
+var setCache = cache.New(cache.Config{
+	Next: func(c *fiber.Ctx) bool {
+		for _, cachedPath := range cachedPaths {
+			if strings.Contains(c.Path(), cachedPath) {
+				return false
+			}
+		}
+		return true
+	},
+	Expiration:   2 * time.Minute,
+	CacheControl: true,
+})
 
 func SetRoutes(app *fiber.App) {
 	api := app.Group("/api") // Routes located at : /api
@@ -51,6 +69,8 @@ func SetRoutes(app *fiber.App) {
 	admin.Get("/me", getUser)
 	admin.Post("/create", manuallyCreateUrl)
 	admin.Get("/backups", getBackupList)
+	admin.Delete("/backups/:fileName", deleteBackupObject)
+	admin.Get("/settings", getSettings)
 	admin.Put("/settings", updateSettings)
 
 }

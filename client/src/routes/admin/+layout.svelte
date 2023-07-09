@@ -26,6 +26,7 @@
 		<div class="w-full flex justify-center items-center pb-5">
 			<div class="btn-group variant-filled-surface">
 				<a href="/admin" class="btn" data-sveltekit-preload-data="hover">Home</a>
+				<a href="/admin/backups" class="btn" data-sveltekit-preload-data="hover">Backups</a>
 				<a href="/admin/settings" class="btn" data-sveltekit-preload-data="hover">Settings</a>
 				<a href="/admin/logout" class="btn" data-sveltekit-preload-data="tap">Logout</a>
 			</div>

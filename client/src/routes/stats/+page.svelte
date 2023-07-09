@@ -61,9 +61,7 @@
 			<div class="icon m-5 text-primary-500"><FaLink /></div>
 			<div class="text-right">
 				<h2 class="text-4xl py-2">{data.counts.countAll}</h2>
-				<p class="text-base text-surface-500 dark:text-surface-200">
-					Total number of links indexed
-				</p>
+				<p class="text-base text-surface-500 dark:text-surface-200">Total number of links found</p>
 			</div>
 		</div>
 		<div class="card flex items-center justify-between p-5">
@@ -71,7 +69,7 @@
 			<div class="text-right">
 				<h2 class="text-4xl py-2">{data.counts.countTrue}</h2>
 				<p class="text-base text-surface-500 dark:text-surface-200">
-					Total number of links indexed
+					Number of links successfully indexed
 				</p>
 			</div>
 		</div>
@@ -79,7 +77,9 @@
 			<div class="icon m-5 text-tertiary-500"><FaExclamation /></div>
 			<div class="text-right">
 				<h2 class="text-4xl py-2">{data.counts.countFalse}</h2>
-				<p class="text-base text-surface-500 dark:text-surface-200">Total number of failed links</p>
+				<p class="text-base text-surface-500 dark:text-surface-200">
+					Number of links that failed to be indexed
+				</p>
 			</div>
 		</div>
 	</div>
