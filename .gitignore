@@ -1,5 +1,6 @@
 .env
 /tmp
+/static
 
 # Client
 .DS_Store
