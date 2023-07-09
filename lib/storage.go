@@ -34,8 +34,8 @@ func UploadFile(file []byte, filename string) error {
 }
 
 type StoredObject struct {
-	Key          *string
-	DateModified *time.Time
+	Key          *string    `json:"fileName"`
+	DateModified *time.Time `json:"dateModified"`
 }
 
 // ListObjects lists the objects in bucket.
@@ -61,6 +61,20 @@ func ListObjects() ([]StoredObject, error) {
 		}
 	}
 	return contents, err
+}
+
+func DeleteObject(objectKey string) error {
+	client := getS3Client()
+	storageBucket := os.Getenv("STORAGE_BUCKET")
+	input := &s3.DeleteObjectInput{
+		Bucket: aws.String(storageBucket),
+		Key:    aws.String(objectKey),
+	}
+	_, err := client.DeleteObject(context.TODO(), input)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetPresignedURL(objectKey string, lifetimeSecs int64) (*v4.PresignedHTTPRequest, error) {

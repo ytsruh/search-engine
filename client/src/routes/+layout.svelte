@@ -8,8 +8,11 @@
 	import { AppShell, AppBar } from '@skeletonlabs/skeleton';
 	import { LightSwitch } from '@skeletonlabs/skeleton';
 	import FaSearchengin from 'svelte-icons/fa/FaSearchengin.svelte';
+	import FaSignInAlt from 'svelte-icons/fa/FaSignInAlt.svelte';
+	import FaSignOutAlt from 'svelte-icons/fa/FaSignOutAlt.svelte';
 	import { navigating } from '$app/stores';
 	import Loading from '$lib/Loading.svelte';
+	import { isLoggedIn } from '$lib/authStore';
 </script>
 
 <!-- App Shell -->
@@ -25,6 +28,16 @@
 				<a class="btn btn-sm variant-ghost-tertiary" href="/stats" data-sveltekit-preload-data>
 					Stats
 				</a>
+				{#if $isLoggedIn}
+					<a class="btn btn-sm variant-ghost-tertiary" href="/admin/logout">
+						<span class="login-icon text-tertiary-900 dark:text-tertiary-100"><FaSignOutAlt /></span
+						>
+					</a>
+				{:else}
+					<a class="btn btn-sm variant-ghost-tertiary" href="/login">
+						<span class="login-icon text-tertiary-900 dark:text-tertiary-100"><FaSignInAlt /></span>
+					</a>
+				{/if}
 				<LightSwitch />
 			</svelte:fragment>
 		</AppBar>
@@ -41,5 +54,9 @@
 	.icon {
 		width: 24px;
 		height: 24px;
+	}
+	.login-icon {
+		width: 20px;
+		height: 20px;
 	}
 </style>

@@ -3,10 +3,8 @@ package routes
 import (
 	"fmt"
 	"net/url"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	database "ytsruh.com/search/db"
 	"ytsruh.com/search/lib"
 )
@@ -83,14 +81,6 @@ func runSearch(c *fiber.Ctx) error {
 		"results": searchResults,
 	})
 }
-
-var setCache = cache.New(cache.Config{
-	Next: func(c *fiber.Ctx) bool {
-		return c.Path() != "/api/stats"
-	},
-	Expiration:   2 * time.Minute,
-	CacheControl: true,
-})
 
 func getStats(c *fiber.Ctx) error {
 	results, err := database.GetPublicStats()

@@ -37,6 +37,18 @@ func manuallyCreateUrl(c *fiber.Ctx) error {
 	})
 }
 
+func getSettings(c *fiber.Ctx) error {
+	settings, err := database.GetSettings()
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"message": "failed to update settings",
+		})
+	}
+	return c.JSON(fiber.Map{
+		"settings": settings,
+	})
+}
+
 func updateSettings(c *fiber.Ctx) error {
 	settings := &database.Settings{
 		ID: 1,
@@ -64,7 +76,18 @@ func getBackupList(c *fiber.Ctx) error {
 			"message": "error getting objects",
 		})
 	}
+	return c.Status(200).JSON(results)
+}
+
+func deleteBackupObject(c *fiber.Ctx) error {
+	fullPath := "search/" + c.Params("fileName")
+	err := lib.DeleteObject(fullPath)
+	if err != nil {
+		return c.JSON(fiber.Map{
+			"message": "error deleting object",
+		})
+	}
 	return c.Status(200).JSON(fiber.Map{
-		"data": results,
+		"message": "object deleted",
 	})
 }
