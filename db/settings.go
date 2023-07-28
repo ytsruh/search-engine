@@ -2,14 +2,16 @@ package database
 
 import (
 	"fmt"
-	"gorm.io/gorm"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type Settings struct {
 	ID        uint           `gorm:"primaryKey"`
 	SearchOn  bool           `json:"on"`
 	Amount    int            `json:"amount"`
+	AddNew    bool           `json:"addNew"`
 	CreatedAt time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`

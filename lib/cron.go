@@ -87,12 +87,16 @@ func searchEngine() {
 				newUrls = append(newUrls, database.CrawledUrl{Url: newUrl})
 			}
 		} // End of range
-		// Insert newly found urls into database
-		error := database.InsertManyUrls(&newUrls)
-		if error != nil {
-			fmt.Println("something went wrong adding new urls to database")
+		if settings.AddNew {
+			// Insert newly found urls into database
+			error := database.InsertManyUrls(&newUrls)
+			if error != nil {
+				fmt.Println("something went wrong adding new urls to database")
+			}
+			fmt.Printf("Added %d new urls to database \n", len(newUrls))
+		} else {
+			fmt.Printf("Adding new urls to database is disabled")
 		}
-		fmt.Printf("Added %d new urls to database \n", len(newUrls))
 	}
 
 }
