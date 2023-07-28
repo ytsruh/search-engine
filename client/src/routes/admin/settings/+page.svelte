@@ -8,6 +8,7 @@
 
 	let searchOn = data.settings.on;
 	let amount = data.settings.amount;
+	let addNew = data.settings.addNew;
 	let loading = false;
 
 	async function submit(e: any) {
@@ -27,7 +28,7 @@
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ on: searchOn, amount: amount })
+			body: JSON.stringify({ on: searchOn, amount: amount, addNew: addNew })
 		});
 		if (!response.ok) {
 			const t: ToastSettings = {
@@ -77,6 +78,22 @@
 								name="search-on"
 								value={false}
 							/>
+							<p>Off</p>
+						</div>
+					</label>
+				</div>
+			</label>
+
+			<label class="label py-2">
+				<p class="py-4">Add New Urls:</p>
+				<div class="space-y-2">
+					<label class="flex items-center justify-around">
+						<div class="flex items-center space-x-5">
+							<input class="radio" type="radio" bind:group={addNew} name="add-new" value={true} />
+							<p>On</p>
+						</div>
+						<div class="flex items-center space-x-5">
+							<input class="radio" type="radio" bind:group={addNew} name="add-new" value={false} />
 							<p>Off</p>
 						</div>
 					</label>
