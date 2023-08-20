@@ -15,7 +15,7 @@ import (
 func RunCron() {
 	c := cron.New()
 	c.AddFunc("0 * * * *", searchEngine) // Run every hour
-	c.AddFunc("0 0 * * *", backupDB)     // Run at midnight every night
+	c.AddFunc("0 0 * * 1", backupDB)     // Run at midnight every Monday night
 	c.Start()
 	cronCount := len(c.Entries())
 	fmt.Printf("Setup %d cron jobs \n", cronCount)

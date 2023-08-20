@@ -1,1 +1,0 @@
-import{i as e}from"../chunks/authStore.a8bdaebf.js";import{g as t}from"../chunks/navigation.96bc44bb.js";const a=async({fetch:o})=>{await o("/api/auth/logout",{method:"post",headers:{"Content-Type":"application/json"}}),e.set(!1),t("/login")},i=Object.freeze(Object.defineProperty({__proto__:null,load:a},Symbol.toStringTag,{value:"Module"}));export{i as universal};
