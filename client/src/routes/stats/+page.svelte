@@ -18,17 +18,14 @@
 	ChartJS.register(LineElement, LinearScale, PointElement, CategoryScale, Tooltip, Title);
 
 	export let data: PageData;
-	const total = data.latest.reduce((a: any, b: any) => {
-		return a + b.count;
-	}, 0);
+
+	// const total = data.latest.reduce((a: any, b: any) => {
+	// 	return a + b.count;
+	// }, 0);
+	const total: any = [];
+
 	const chartData: any = {
-		labels: data.latest.map((key: any) => {
-			return new Date(key.date).toLocaleString('en-GB', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric'
-			});
-		}),
+		labels: total,
 		datasets: [
 			{
 				label: '# urls found',
@@ -40,9 +37,7 @@
 				pointBorderWidth: 10,
 				pointRadius: 1,
 				pointHitRadius: 10,
-				data: data.latest.map((key: any) => {
-					return key.count;
-				})
+				data: total
 			}
 		]
 	};
@@ -83,80 +78,90 @@
 			</div>
 		</div>
 	</div>
-	<div class="grid grid-cols-1 md:grid-cols-2 gap-5 p-5">
-		<div class="card">
-			<div class="table-container">
-				<table class="table table-hover w-full">
-					<thead>
-						<tr>
-							<th class="text-center">Date</th>
-							<th class="text-center">New Links Found</th>
-						</tr>
-					</thead>
-					<tbody class="text-center">
-						{#each data.latest as row, i}
+	{#if data.latest}
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-5 p-5">
+			<div class="card">
+				<div class="table-container">
+					<table class="table table-hover w-full">
+						<thead>
 							<tr>
-								<td
-									>{new Date(row.date).toLocaleString('en-GB', {
-										weekday: 'long',
-										year: 'numeric',
-										month: 'long',
-										day: 'numeric'
-									})}</td
-								>
-								<td>{row.count}</td>
+								<th class="text-center">Date</th>
+								<th class="text-center">New Links Found</th>
 							</tr>
-						{/each}
-					</tbody>
-				</table>
-				<div class="text-center py-4">
-					<p class="text-xl">
-						Total links found in last 7 days : <span class="text-secondary-500">{total}</span>
-					</p>
+						</thead>
+						<tbody class="text-center">
+							{#each data.latest as row, i}
+								<tr>
+									<td
+										>{new Date(row.date).toLocaleString('en-GB', {
+											weekday: 'long',
+											year: 'numeric',
+											month: 'long',
+											day: 'numeric'
+										})}</td
+									>
+									<td>{row.count}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+					<div class="text-center py-4">
+						<p class="text-xl">
+							Total links found in last 7 days : <span class="text-secondary-500">{total}</span>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="card flex items-center justify-center">
+				<div class="px-10 py-20 w-full h-96">
+					{#if data.latest}
+						<Line
+							data={chartData}
+							options={{
+								scales: {
+									y: {
+										ticks: {
+											color: $modeCurrent ? '#000' : '#fff'
+										},
+										grid: { display: false }
+									},
+									x: {
+										ticks: {
+											color: $modeCurrent ? '#000' : '#fff',
+											maxRotation: 45,
+											minRotation: 45
+										},
+										grid: { display: false }
+									}
+								},
+								maintainAspectRatio: false,
+								plugins: {
+									tooltip: { enabled: true },
+									legend: {
+										display: false
+									},
+									title: {
+										color: $modeCurrent ? '#000' : '#fff',
+										display: true,
+										text: 'Urls found per day',
+										font: {
+											size: 20
+										}
+									}
+								}
+							}}
+						/>
+					{/if}
 				</div>
 			</div>
 		</div>
-		<div class="card flex items-center justify-center">
-			<div class="px-10 py-20 w-full h-96">
-				<Line
-					data={chartData}
-					options={{
-						scales: {
-							y: {
-								ticks: {
-									color: $modeCurrent ? '#000' : '#fff'
-								},
-								grid: { display: false }
-							},
-							x: {
-								ticks: {
-									color: $modeCurrent ? '#000' : '#fff',
-									maxRotation: 45,
-									minRotation: 45
-								},
-								grid: { display: false }
-							}
-						},
-						maintainAspectRatio: false,
-						plugins: {
-							tooltip: { enabled: true },
-							legend: {
-								display: false
-							},
-							title: {
-								color: $modeCurrent ? '#000' : '#fff',
-								display: true,
-								text: 'Urls found per day',
-								font: {
-									size: 20
-								}
-							}
-						}
-					}}
-				/>
+	{:else}
+		<div class="grid grid-cols-1 gap-5 p-5 mx-10">
+			<div class="card p-10">
+				<h6 class="text-center">No latest data available</h6>
 			</div>
 		</div>
-	</div>
+	{/if}
 </div>
 
 <style>
