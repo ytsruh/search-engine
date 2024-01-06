@@ -27,10 +27,15 @@ var setCache = cache.New(cache.Config{
 	CacheControl: true,
 })
 
-func SetAPIRoutes(app *fiber.App) {
+func SetRoutes(app *fiber.App) {
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
 			"PageTitle": "Welcome to the ytsruh search engine",
+		})
+	})
+	app.Get("/about", func(c *fiber.Ctx) error {
+		return c.Render("about", fiber.Map{
+			"PageTitle": "About the ytsruh search engine",
 		})
 	})
 	app.Get("/metrics", monitor.New(monitor.Config{Title: "Live Server Metrics"}))

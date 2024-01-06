@@ -1,6 +1,12 @@
 version: "3"
 
 tasks:
+  tailwind:
+    cmds:
+      - ./tailwindcss -i lib/styles.css -o static/output.css --watch
+  tailwind-build:
+    cmd:
+      - ./tailwindcss -i lib/styles.css -o static/output.css --minify
   db-generate:
     cmds:
       - go run github.com/steebchen/prisma-client-go generate --schema=./schema.prisma

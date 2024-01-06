@@ -42,15 +42,18 @@ func main() {
 
 	// Setup middleware & DB connection
 	app.Use(compress.New())
-	app.Use(helmet.New())
+	app.Use(helmet.New(helmet.Config{
+		//Override default options below
+		CrossOriginEmbedderPolicy: "same-origin",
+	}))
 	app.Use(recover.New())
 
-	// Define API routes & start cron tasks
-	routes.SetAPIRoutes((app))
+	// Define routes & start cron tasks
+	routes.SetRoutes((app))
 	lib.RunCron()
 
 	// Serve front end by using the fallback route
-	app.Static("/", "./static")
+	app.Static("/static", "./static")
 
 	//Start server with graceful shutdown
 	// Listen from goroutine
