@@ -1,0 +1,57 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator db {
+  provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+model crawled_urls {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url              String    @unique
+  success          Boolean?
+  crawl_duration   BigInt?
+  response_code    BigInt?
+  page_title       String?
+  page_description String?
+  headings         String?
+  last_tested      DateTime? @db.Timestamptz(6)
+  created_at       DateTime? @db.Timestamptz(6)
+  updated_at       DateTime? @db.Timestamptz(6)
+  deleted_at       DateTime? @db.Timestamptz(6)
+
+  @@index([deleted_at], map: "idx_crawled_urls_deleted_at")
+}
+
+model search_queries {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  query      String?
+  ip         String?
+  user_agent String?
+  platform   String?
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  deleted_at DateTime? @db.Timestamptz(6)
+
+  @@index([deleted_at], map: "idx_search_queries_deleted_at")
+}
+
+model settings {
+  id         BigInt    @id @default(autoincrement())
+  search_on  Boolean?
+  amount     BigInt?
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  deleted_at DateTime? @db.Timestamptz(6)
+  add_new    Boolean?
+
+  @@index([deleted_at], map: "idx_settings_deleted_at")
+}
+
+model users {
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String?
+  email    String?
+  password Bytes?
+}
