@@ -2,20 +2,15 @@ package lib
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
 	"time"
 
 	"github.com/robfig/cron/v3"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	database "ytsruh.com/search/db"
 )
 
 func RunCron() {
 	c := cron.New()
 	c.AddFunc("0 * * * *", searchEngine) // Run every hour
-	c.AddFunc("0 0 * * 1", backupDB)     // Run at midnight every Monday night
 	c.Start()
 	cronCount := len(c.Entries())
 	fmt.Printf("Setup %d cron jobs \n", cronCount)
@@ -99,39 +94,4 @@ func searchEngine() {
 		}
 	}
 
-}
-
-func backupDB() {
-	fmt.Println("started backup...")
-	defer fmt.Println("backup has finished")
-	// Define the connection string
-	connectionString := os.Getenv("DB_URL")
-	// Generate a filename with the current date and time
-	backupFileName := "search/" + time.Now().Format("20060102") + ".sql"
-	// Connect to the PostgreSQL database
-	db, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
-	if err != nil {
-		fmt.Println("Failed to connect to database:", err)
-		return
-	}
-	dbConn, err := db.DB()
-	if err != nil {
-		fmt.Println("Failed to get database connection:", err)
-		return
-	}
-	defer dbConn.Close()
-
-	// Execute the pg_dump command to backup the database
-	cmd := exec.Command("pg_dump", connectionString)
-	output, err := cmd.Output()
-	if err != nil {
-		fmt.Println("Failed to backup database:", err)
-		return
-	}
-	uploadErr := UploadFile(output, backupFileName)
-	if uploadErr != nil {
-		fmt.Println("Failed to upload database backup:", uploadErr)
-		return
-	}
-	fmt.Println("Backup completed successfully! File:", backupFileName)
 }
