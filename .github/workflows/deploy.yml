@@ -27,6 +27,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v2
 
+      - name: Generate Prisma Client
+        run: go run github.com/steebchen/prisma-client-go generate --schema=./schema.prisma
+
       - name: Run Tests
         run: go test ./...
 
