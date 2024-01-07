@@ -1,0 +1,47 @@
+<div class="flex flex-col justify-center items-center">
+  <div class="w-full md:w-2/3 lg:w-1/2 px-5">
+    <div class="flex justify-between items-center">
+      <h1 class="text-center text-3xl text-accent py-5">Search Engine Dashboard</h1>
+      <button hx-post="/logout" class="btn btn-outline btn-primary">Logout</button>
+    </div>
+    <form
+      class="flex flex-col items-center gap-y-5"
+      hx-boost="true"
+      hx-post="/dashboard"
+      hx-target="#feedback"
+      hx-indicator="#indicator">
+      <label class="form-control w-full lg:max-w-md">
+        <div class="label">
+          <span class="label-text">Urls per hour:</span>
+        </div>
+        <input type="number" name="amount" value="{{.Amount}}" class="input input-bordered w-full" required />
+      </label>
+      <div class="form-control w-full lg:max-w-md">
+        <label class="cursor-pointer label flex justify-between items-center">
+          <span class="label-text">Search On:</span>
+          <input
+            type="checkbox"
+            name="searchOn"
+            class="toggle toggle-primary"
+            {{if
+            .SearchOn}}checked{{end}} />
+        </label>
+      </div>
+      <div class="form-control w-full lg:max-w-md">
+        <label class="cursor-pointer label flex justify-between items-center">
+          <span class="label-text">Add New URLs:</span>
+          <input type="checkbox" name="addNew" class="toggle toggle-secondary" {{if .AddNew}}checked{{end}} />
+        </label>
+      </div>
+      <div class="py-5 w-full lg:max-w-md">
+        <button hx-disabled-elt="this" type="submit" class="btn btn-outline btn-accent w-full">
+          <div id="indicator" class="htmx-indicator">
+            <span class="h-4 w-4 mr-2 loading loading-spinner text-accent"></span>
+          </div>
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+  <div id="feedback"></div>
+</div>
