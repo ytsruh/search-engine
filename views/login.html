@@ -1,0 +1,30 @@
+<div class="flex flex-col justify-center items-center">
+  <h1 class="py-5 text-3xl text-primary">Login to ytsruh search admin panel</h1>
+  <form
+    class="w-1/2 flex flex-col justify-center items-center"
+    hx-post="/login"
+    hx-target="#feedback"
+    hx-indicator="#indicator">
+    <label class="form-control w-full lg:max-w-md">
+      <div class="label">
+        <span class="label-text">Username</span>
+      </div>
+      <input type="email" name="email" autocomplete="off" class="input input-bordered w-full" required />
+    </label>
+    <label class="form-control w-full lg:max-w-md">
+      <div class="label">
+        <span class="label-text">Password</span>
+      </div>
+      <input type="password" name="password" class="input input-bordered w-full" required />
+    </label>
+    <div class="py-5 w-full lg:max-w-md">
+      <button type="submit" class="btn btn-outline btn-primary w-full">Login</button>
+    </div>
+  </form>
+  <div id="indicator" class="htmx-indicator">
+    <div class="flex items-center justify-center w-full">
+      <span class="h-20 w-20 loading loading-spinner text-primary"></span>
+    </div>
+  </div>
+  <div id="feedback"></div>
+</div>

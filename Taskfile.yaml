@@ -1,0 +1,29 @@
+version: "3"
+
+tasks:
+  tailwind:
+    cmds:
+      - ./tailwindcss -i lib/input.css -o static/styles.css --watch
+  tailwind-build:
+    cmd:
+      - ./tailwindcss -i lib/input.css -o static/styles.css --minify
+  db-generate:
+    cmds:
+      - go run github.com/steebchen/prisma-client-go generate --schema=./schema.prisma
+    silent: true
+  db-push:
+    cmds:
+      - go run github.com/steebchen/prisma-client-go db push --schema=./schema.prisma
+    silent: true
+  db-pull:
+    cmds:
+      - go run github.com/steebchen/prisma-client-go db pull --schema=./schema.prisma
+    silent: true
+  db-migrate:
+    cmds:
+      - go run github.com/steebchen/prisma-client-go migrate dev --schema=./schema.prisma
+    silent: true
+  db-deploy:
+    cmds:
+      - go run github.com/steebchen/prisma-client-go migrate deploy --schema=./schema.prisma
+    silent: true

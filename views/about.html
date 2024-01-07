@@ -1,0 +1,105 @@
+<div class="px-2 md:px-28 lg:px-48">
+  <div class="text-center">
+    <h1 class="text-3xl text-primary py-2">About ytsruh search</h1>
+    <p class="text-xl text-muted">
+      A simple search engine built for fun. Built using go/golang, it features a custom web crawler & custom
+      algorithms to index websites including their meta data.
+    </p>
+  </div>
+
+  <div class="py-10">
+    <h2 class="text-xl text-primary py-2">Database Statistics:</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <div class="flex items-center gap-x-2">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-primary">
+              <path
+                d="M14.8284 12L16.2426 13.4142L19.071 10.5858C20.6331 9.02365 20.6331 6.49099 19.071 4.9289C17.509 3.3668 14.9763 3.3668 13.4142 4.9289L10.5858 7.75732L12 9.17154L14.8284 6.34311C15.6095 5.56206 16.8758 5.56206 17.6568 6.34311C18.4379 7.12416 18.4379 8.39049 17.6568 9.17154L14.8284 12Z"
+                fill="currentColor" />
+              <path
+                d="M12 14.8285L13.4142 16.2427L10.5858 19.0711C9.02372 20.6332 6.49106 20.6332 4.92896 19.0711C3.36686 17.509 3.36686 14.9764 4.92896 13.4143L7.75739 10.5858L9.1716 12L6.34317 14.8285C5.56212 15.6095 5.56212 16.8758 6.34317 17.6569C7.12422 18.4379 8.39055 18.4379 9.1716 17.6569L12 14.8285Z"
+                fill="currentColor" />
+              <path
+                d="M14.8285 10.5857C15.219 10.1952 15.219 9.56199 14.8285 9.17147C14.4379 8.78094 13.8048 8.78094 13.4142 9.17147L9.1716 13.4141C8.78107 13.8046 8.78107 14.4378 9.1716 14.8283C9.56212 15.2188 10.1953 15.2188 10.5858 14.8283L14.8285 10.5857Z"
+                fill="currentColor" />
+            </svg>
+            <h2 class="card-title text-2xl">{{.Total}}</h2>
+          </div>
+          <p class="text-xl">Total number of links found & saved</p>
+        </div>
+      </div>
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <div class="flex items-center gap-x-2">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-success">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12ZM12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4Z"
+                fill="currentColor" />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M13 7C13 6.44772 12.5523 6 12 6C11.4477 6 11 6.44772 11 7V11H7C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13H11V17C11 17.5523 11.4477 18 12 18C12.5523 18 13 17.5523 13 17V13H17C17.5523 13 18 12.5523 18 12C18 11.4477 17.5523 11 17 11H13V7Z"
+                fill="currentColor" />
+            </svg>
+            <h2 class="card-title text-2xl">{{.Success}}</h2>
+          </div>
+          <p class="text-xl">Number of links successfully indexed</p>
+        </div>
+      </div>
+      <div class="card bg-base-100 border">
+        <div class="card-body">
+          <div class="flex items-center gap-x-2">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="text-warning">
+              <path
+                d="M12 6C12.5523 6 13 6.44772 13 7V13C13 13.5523 12.5523 14 12 14C11.4477 14 11 13.5523 11 13V7C11 6.44772 11.4477 6 12 6Z"
+                fill="currentColor" />
+              <path
+                d="M12 16C11.4477 16 11 16.4477 11 17C11 17.5523 11.4477 18 12 18C12.5523 18 13 17.5523 13 17C13 16.4477 12.5523 16 12 16Z"
+                fill="currentColor" />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM4 12C4 16.4183 7.58172 20 12 20C16.4183 20 20 16.4183 20 12C20 7.58172 16.4183 4 12 4C7.58172 4 4 7.58172 4 12Z"
+                fill="currentColor" />
+            </svg>
+            <h2 class="card-title text-2xl">{{.Fail}}</h2>
+          </div>
+          <p class="text-xl">Number of links that failed to be indexed</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="py-10 px-5 md:px-0">
+    <h2 class="text-xl text-primary py-2">Built Using:</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+      <img class="object-fit h-36 md:h-24 w-full bg-white" src="/static/logos/go.png" alt="Go" />
+      <img class="object-fit h-36 md:h-24 w-full bg-white" src="/static/logos/fiber.png" alt="Fiber" />
+      <img class="object-fit h-36 md:h-24 w-full bg-white" src="/static/logos/neon.jpeg" alt="Neon" />
+      <img class="object-fit h-36 md:h-24 w-full bg-white" src="/static/logos/prisma.svg" alt="Prisma" />
+      <img class="object-fit h-36 md:h-24 w-full bg-white" src="/static/logos/railway.svg" alt="Railway" />
+      <img class="object-fit h-36 md:h-24 w-full bg-white" src="/static/logos/tailwind.png" alt="Tailwind" />
+    </div>
+  </div>
+</div>

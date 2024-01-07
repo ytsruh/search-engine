@@ -12,8 +12,8 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/template/html/v2"
 	"github.com/joho/godotenv"
-	database "ytsruh.com/search/db"
 	"ytsruh.com/search/lib"
 	"ytsruh.com/search/routes"
 )
@@ -30,23 +30,30 @@ func main() {
 		port = ":" + port
 	}
 
+	// Initialize standard Go html template engine
+	engine := html.New("./views", ".html")
+
 	app := fiber.New(fiber.Config{
 		IdleTimeout: 5 * time.Second,
+		// Views Layout is the global layout for all template render until override on Render function.
+		Views:       engine,
+		ViewsLayout: "layouts/main",
 	})
 
 	// Setup middleware & DB connection
 	app.Use(compress.New())
-	app.Use(helmet.New())
+	app.Use(helmet.New(helmet.Config{
+		//Override default options below
+		CrossOriginEmbedderPolicy: "same-origin",
+	}))
 	app.Use(recover.New())
-	database.Setup()
 
-	// Define API routes & start cron tasks
+	// Define routes & start cron tasks
 	routes.SetRoutes((app))
 	lib.RunCron()
 
 	// Serve front end by using the fallback route
-	app.Static("/", "./static")
-	app.Static("*", "./static/404.html")
+	app.Static("/static", "./static")
 
 	//Start server with graceful shutdown
 	// Listen from goroutine
