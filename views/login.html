@@ -4,7 +4,8 @@
     class="w-1/2 flex flex-col justify-center items-center"
     hx-post="/login"
     hx-target="#feedback"
-    hx-indicator="#indicator">
+    hx-indicator="#indicator"
+    hx-disabled-elt="#submit-button">
     <label class="form-control w-full lg:max-w-md">
       <div class="label">
         <span class="label-text">Username</span>
@@ -18,7 +19,7 @@
       <input type="password" name="password" class="input input-bordered w-full" required />
     </label>
     <div class="py-5 w-full lg:max-w-md">
-      <button type="submit" class="btn btn-outline btn-primary w-full">Login</button>
+      <button id="submit-button" type="submit" class="btn btn-outline btn-primary w-full">Login</button>
     </div>
   </form>
   <div id="indicator" class="htmx-indicator">
